@@ -10,9 +10,16 @@ import UIKit
 
 class TodoListViewController: UITableViewController {
     var itemArray = ["Find Mike", "Buy Eggos", "Destory Demogorgon"]
+    
+    let defaults = UserDefaults.standard
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.navigationBar.barStyle = UIBarStyle.black
+        
+        if let items = defaults.array(forKey: "TodoListArray") as? [String] {
+            itemArray = items
+        }
         
     }
 
@@ -48,6 +55,9 @@ class TodoListViewController: UITableViewController {
             
             if let newItem = textField.text {
                 self.itemArray.append(newItem)
+                
+                self.defaults.set(self.itemArray, forKey: "TodoListArray")
+                
                 self.tableView.reloadData()
             }
         }
