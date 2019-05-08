@@ -9,7 +9,7 @@
 import UIKit
 import RealmSwift
 
-class TodoListViewController: UITableViewController {
+class TodoListViewController: SwipeTableViewController {
     
     var todoItems: Results<Item>?
     let realm  = try! Realm()
@@ -30,7 +30,6 @@ class TodoListViewController: UITableViewController {
         
         searchBar.delegate = self
         
-        print(Date())
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -38,7 +37,7 @@ class TodoListViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItemCell", for: indexPath)
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
         
         if let item = todoItems?[indexPath.row] {
             cell.textLabel?.text = item.title
@@ -61,14 +60,9 @@ class TodoListViewController: UITableViewController {
                 print("Error saving done status, \(error.localizedDescription)")
             }
         }
-//        todoItems[indexPath.row].done = !todoItems[indexPath.row].done
-//        saveItems()
-        
-//        context.delete(itemArray[indexPath.row])
-//        itemArray.remove(at: indexPath.row)
-        
         
         tableView.deselectRow(at: indexPath, animated: true)
+        
         tableView.reloadData()
     }
     
@@ -107,10 +101,23 @@ class TodoListViewController: UITableViewController {
         present(alert, animated: true, completion: nil)
     }
     
-    //MARK: - Model Manipulation Methods
+    //MARK: - Model Manipulation Methods.
     func loadItems() {
         todoItems = selectedCategory?.items.sorted(byKeyPath: "title", ascending: true)
         tableView.reloadData()
+    }
+    
+    //MARK: - Delete Data From Swipe.
+    override func updateModel(at indexPath: IndexPath) {
+        if let item = todoItems?[indexPath.row] {
+            do {
+                try realm.write {
+                    realm.delete(item)
+                }
+            } catch {
+                print("Error deleting the item, \(error.localizedDescription)")
+            }
+        }
     }
     
 }

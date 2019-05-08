@@ -8,13 +8,10 @@
 
 import UIKit
 import RealmSwift
+import ChameleonFramework
 
-class CategoryViewController: UITableViewController {
-
-//    let config = Realm.Configuration(schemaVersion: 1, migrationBlock: { migration, oldSchemaVersion in
-//        if(oldSchemaVersion < 1) { }
-//    })
-
+class CategoryViewController: SwipeTableViewController {
+    
     lazy var realm = try! Realm()
     
     var categoryArray: Results<Category>?
@@ -23,8 +20,9 @@ class CategoryViewController: UITableViewController {
         super.viewDidLoad()
         
         navigationController?.navigationBar.barStyle = .black
-
-//        Realm.Configuration.defaultConfiguration = config
+        
+        tableView.separatorStyle = .none
+        
         loadData()
     }
     
@@ -34,9 +32,11 @@ class CategoryViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
         
         cell.textLabel?.text = categoryArray?[indexPath.row].name ?? "No Categories Added Yet"
+        
+        cell.backgroundColor = UIColor.randomFlat
         
         return cell
     }
@@ -56,6 +56,38 @@ class CategoryViewController: UITableViewController {
     func loadData() {
         categoryArray = realm.objects(Category.self)
         self.tableView.reloadData()
+    }
+    
+    //MARK: - Delete Data From Swipe.
+    override func updateModel(at indexPath: IndexPath) {
+        if let category = self.categoryArray?[indexPath.row] {
+            if category.items.isEmpty {
+                do {
+                    try self.realm.write {
+                        self.realm.delete(category)
+                    }
+                } catch {
+                    print("Error deleting the Category, \(error.localizedDescription)")
+                }
+            } else {
+                let alert = UIAlertController(title: "Todoey", message: "\(category.name) has items \nIt can't be deleted.", preferredStyle: .alert)
+                let action = UIAlertAction(title: "OK", style: .default, handler: nil)
+
+                alert.addAction(action)
+
+                self.present(alert, animated: true, completion: nil)
+
+                self.tableView.reloadData()
+            }
+        }
+    }
+    
+    override func updateModelWithSwipe(at indexPath: IndexPath) -> Bool {
+        if (categoryArray?[indexPath.row].items.isEmpty)! {
+            return true
+        } else {
+            return false
+        }
     }
     
     //MARK: - Add new Cathegories.
