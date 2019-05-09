@@ -13,7 +13,7 @@ class SwipeTableViewController: UITableViewController, SwipeTableViewCellDelegat
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         tableView.estimatedRowHeight = UITableView.automaticDimension
         tableView.rowHeight = 80.0
     }

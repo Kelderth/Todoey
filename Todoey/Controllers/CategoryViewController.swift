@@ -19,8 +19,6 @@ class CategoryViewController: SwipeTableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        navigationController?.navigationBar.barStyle = .black
-        
         tableView.separatorStyle = .none
         
         loadData()
@@ -41,6 +39,10 @@ class CategoryViewController: SwipeTableViewController {
             
             cell.backgroundColor = categoryColour
             cell.textLabel?.textColor = ContrastColorOf(categoryColour, returnFlat: true)
+            
+            if !category.items.isEmpty {
+                cell.accessoryType = .disclosureIndicator
+            }
         }
         
         return cell

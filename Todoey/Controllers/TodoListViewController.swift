@@ -34,6 +34,7 @@ class TodoListViewController: SwipeTableViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+
         super.viewWillAppear(animated)
         
         title = selectedCategory?.name
@@ -73,8 +74,8 @@ class TodoListViewController: SwipeTableViewController {
             if let colour = UIColor(hexString: selectedCategory!.backgroundColorCell)?.darken(byPercentage: CGFloat(indexPath.row) / CGFloat(todoItems!.count)) {
                 cell.backgroundColor = colour
                 cell.textLabel?.textColor = ContrastColorOf(colour, returnFlat: true)
+                cell.tintColor = ContrastColorOf(colour, returnFlat: true)
             }
-            
             cell.accessoryType = item.done == true ? .checkmark : .none
         } else {
             cell.textLabel?.text = "No Items Added."
